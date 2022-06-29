@@ -30,7 +30,7 @@ You need to:
 
 - Have a project that's ready to be live.
 - Have a domain and have access to its settings on the registrar's website.
-- (Optional) Have the [CLI](../../development/cli/_index.md) installed locally.
+- (Optional) Have the [CLI](../development/cli/_index.md) installed locally.
 - Make sure that your registrar allows [CNAMEs on Apex domains or one of the alternatives](/domains/steps/dns.md).
 
 ## 1. Set your domain

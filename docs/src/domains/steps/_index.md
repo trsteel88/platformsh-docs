@@ -64,7 +64,7 @@ The way to do so will vary somewhat depending on your registrar, but nearly all 
 Some will call it an Alias or similar alternate name,
 but either way the intent is to say "this domain should always resolve to... this other domain".
 
-You can access the CNAME target by running the [CLI command](../../development/cli/_index.md) `platform environment:info edge_hostname`.
+You can access the CNAME target by running the [CLI](../../development/cli/_index.md) command `platform environment:info edge_hostname`.
 The CNAME target is the host name by which Platform.sh knows your environment.
 Add a CNAME record from your desired domain (`www.example.com`) to the value of the CNAME target.
 
