@@ -7,7 +7,8 @@ During the Hugo migration, the public docs became a multi-app project:
 
 ## High level goals
 
-There are a two goals accomplished by all the implementation details in the `build`, `deploy` and `post_deploy` phases of the project:
+There are a two goals accomplished by all the implementation details
+in the `build`, `deploy` and `post_deploy` phases of the project:
 
 1. The `search` app should be *protected* from users modifying the index, but `docs` should be *authorized* to communicate with the backend `search` app.
     - *Protect Meilisearch & creating a public key:* Meilisearch is protected with a *master key*, which is required to modify the documents that can be searched and configure how results are sorted. In this project, the `PLATFORM_PROJECT_ENTROPY` environment variable is used for this purpose. It saves us having to define one from scratch, and it's a value that both `docs` and `search` already know about.
