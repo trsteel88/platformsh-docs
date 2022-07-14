@@ -16,6 +16,10 @@
 
       url.searchParams.set('stack', targetStackString);
       history.pushState(null, document.title, url.toString());
+    },
+    frametech: 'default',
+    switchFrametech(targetFrametech) { 
+      this.frametech = targetFrametech;
     }
   }"
   {{ end }}>
