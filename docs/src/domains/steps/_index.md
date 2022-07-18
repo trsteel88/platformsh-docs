@@ -16,10 +16,12 @@ you should first configure the domain on the Platform.sh side, and only then swi
 
 ## Before you begin
 
-You need to have:
+You need to:
 
-- A domain and have access to its settings on the registrar's website.
-- The [CLI](../../development/cli/_index.md) installed locally.
+- Have a project that’s ready to be live.
+- Have a domain and have access to its settings on the registrar’s website.
+- (Optional) Have the [CLI](../../development/cli/_index.md) installed locally.
+- Make sure that your registrar allows [CNAMEs on Apex domains or one of the alternatives](../steps/dns.md).
 
 ## 1. Change your plan to a production plan
 
@@ -54,6 +56,18 @@ You can find more information on pricing on the [pricing page](https://platform.
 {{< codetabs >}}
 
 ---
+title=With a CDN
+file=none
+highlight=false
+---
+
+If you are serving the site through a CDN, configure your DNS provider to point at your CDN account.
+The address or CNAME to set for that varies with the CDN provider.
+Refer to their documentation or to the [CDN guide](/domains/cdn/_index.md).
+
+<--->
+
+---
 title=Without a CDN
 file=none
 highlight=false
@@ -79,6 +93,8 @@ see the additional information about [Apex domains and CNAME records](/domains/s
 If you are planning to host multiple subdomains on different projects,
 see the additional information about [Subdomains](/domains/steps/subdomains.md) *before* you add your domain to Platform.sh.
 
+{{< /codetabs >}}
+
 ## 3. Set your domain in Platform.sh
 
 {{< note >}}
@@ -88,7 +104,7 @@ The CDN should already have been configured in advance to point to Platform.sh a
 
 {{< /note >}}
 
-This step tells the Platform.sh edge layer where to route requests for your web site.
+This step tells the Platform.sh edge layer where to route requests for your website.
 You can do this through the CLI with `platform domain:add <YOUR_DOMAIN>`
 or [using the management console](/administration/web/configure-project.md#domains).
 
@@ -103,44 +119,53 @@ To get the IP address, first run `platform environment:info edge_hostname`.
 That prints the "internal" domain name for your project.
 Run `ping <YOUR_DOMAIN>` to get its IP address.
 
-On macOS X and Linux you can add that IP  to your `/etc/hosts` file.
-In Windows the file is named `c:\Windows\System32\Drivers\etc\hosts`.
-You need to be a admin user to be able to change that file.
-On macOS you usually run something like `sudo vi /etc/hosts`.
-After adding the line the file looks like:
-
-![Hosts File](/images/config-files/hosts-file.png "0.4")
-
-Alternatively, there's an add-on for Firefox
-that allows you to dynamically switch DNS IP addresses without modifying your `hosts` file.
-
-- [Firefox LiveHosts add-on](https://addons.mozilla.org/en-US/firefox/addon/livehosts/)
-
-{{< note >}}
-
-Don't put the IP address you see here, but the one you got from the ping command.
-
-*Also, remember to remove this entry after you have configured DNS!*
-
-{{< /note >}}
-
-Sometimes it can take Let's Encrypt a couple of minutes to provision the certificate the first time.
-This is normal, and only means the first deploy after enabling a domain may take longer than usual.
-Setting the CNAME record with your DNS provider first helps to minimize that disruption.
-
-<--->
+{{< codetabs >}}
 
 ---
-title=With a CDN
+title=On macOS and linux
 file=none
 highlight=false
 ---
 
-If you are serving the site through a CDN, configure your DNS provider to point at your CDN account.
-The address or CNAME to set for that varies with the CDN provider.
-Refer to their documentation or to the [CDN guide](/domains/cdn/_index.md).
+1. With an admin account, open the `/etc/hosts` file with `sudo vi /etc/hosts` or with your favorite text editor.
+2. Add the IP to that file. TODO be more clear about the steps: adapt the IP, add the domain, remove the entry once the DNS is configured, ...
+3. Save and close the file.
+
+After adding the line the file looks like:
+
+![Hosts File](/images/config-files/hosts-file.png "0.4")
+
+<--->
+
+---
+title=On windows
+file=none
+highlight=false
+---
+
+1. With an admin account, open the `c:\Windows\System32\Drivers\etc\hosts` file with your favorite text editor.
+2. Add the IP to that file.
+3. Save and close the file.
+
+After adding the line the file looks like:
+
+![Hosts File](/images/config-files/hosts-file.png "0.4")
+
+<--->
+
+---
+title=In the browser
+file=none
+highlight=false
+---
+
+You can dynamically switch DNS IP addresses without modifying your `hosts` file with the [Firefox LiveHosts add-on](https://addons.mozilla.org/en-US/firefox/addon/livehosts/).
 
 {{< /codetabs >}}
+
+Sometimes it can take Let's Encrypt a couple of minutes to provision the certificate the first time.
+This is normal, and only means the first deploy after enabling a domain may take longer than usual.
+Setting the CNAME record with your DNS provider first helps to minimize that disruption.
 
 ## Bonus steps (Optional)
 
