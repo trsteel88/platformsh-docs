@@ -3,15 +3,15 @@ title: "Custom Domains - Step by step guide"
 weight: 2
 sidebarTitle: "Step by step guide"
 description: |
-  Configuring custom domains on Platform.sh is a simple two or three step process. You can either use the Platform.sh management console or the CLI to configure your project for production. Once you are familiar with it the whole process usually takes a couple of minutes.
+  Once your project is ready for production, you can add a custom domain to it.
 layout: single
 ---
 
 {{% description %}}
 
 {{< note >}}
-The order of operations is not really important, but if you are migrating a site from an existing provider,
-you should first configure the domain on the Platform.sh side, and only then switch DNS over.
+If you are migrating a site from an existing provider,
+configure the domain on your project before switching DNS over.
 {{< /note >}}
 
 ## Before you begin
@@ -25,29 +25,24 @@ You need to:
 
 ## 1. Change your plan to a production plan
 
-If you are on a Development plan, you can't add a domain.
-You need to upgrade your subscription to a production plan.
-
-{{< note >}}
-You are able to add a domain to your production environment.
-However, the domain used for non-production environments is always generated and can't be customized,
+Note that the domain used for non-production environments is always generated and can't be customized,
 even if your project is on a Production plan.
-{{< /note >}}
 
-In the [console](https://console.platform.sh), click the **More** button for your project and select **Edit plan**.
+If you are on a Development plan, you can't add a domain.
+Upgrade your subscription to a production plan:
 
-![Edit Plan](/images/management-console/edit-plan.png "0.3")
+<!--This is in HTML to get the icon not to break the list. -->
+<ol>
+  <li>Access the <a href="https://console.platform.sh">project overview</a></li>
+  <li>On the tile of the project you want to edit, click {{< icon more >}}</strong>More</strong>.</li>
+  <li>Click <strong>Edit plan</strong>.</li>
+  <li>Change the type of plan to at least <code>Standard</code> to go live. When you make changes, the monthly price you pay is updated.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
 
-You can also access information about the project's plan under "Billing"
-and then by selecting the project from your list of projects.
-You can make changes to the project by clicking ‘Upgrade Plan’.
-
-![Edit Plan](/images/management-console/billing-plan-upgrade.png "0.4")
-
-You can make changes to the type of plan, the number of environments, amount of storage and number of users here.
-When you make changes, the monthly price you pay is updated. Click `Upgrade plan` to save the new settings.
-
-![Edit Plan Choose](/images/management-console/settings-upgrade-plan.png "0.4")
+TODO update screenshots and delete the legacy ones
+<!-- ![Edit Plan](/images/management-console/edit-plan.png "0.3")
+![Edit Plan Choose](/images/management-console/settings-upgrade-plan.png "0.4") -->
 
 You can find more information on pricing on the [pricing page](https://platform.sh/pricing).
 
@@ -72,26 +67,54 @@ title=Without a CDN
 file=none
 highlight=false
 ---
-Configure your DNS provider to point your domain to your Platform.sh production environment domain name.
 
-The way to do so will vary somewhat depending on your registrar, but nearly all registrars should allow you to set a CNAME.
-Some will call it an Alias or similar alternate name,
-but either way the intent is to say "this domain should always resolve to... this other domain".
+To configure your domain name to point to your project:
 
-You can access the CNAME target by running the [CLI](../../development/cli/_index.md) command `platform environment:info edge_hostname`.
-The CNAME target is the host name by which Platform.sh knows your environment.
-Add a CNAME record from your desired domain (`www.example.com`) to the value of the CNAME target.
+1. Log-in to your registrar's website to manage your domain.
+2. Set the Time-To-Live (TTL) on your domain to the lowest possible value to minimize transition time.
+TODO fix nested Codetabs
+{{< codetabs >}}
 
-If you have multiple domains you want to be served by the same application you will need to add a CNAME record for each of them.
+---
+title=Using the CLI
+file=none
+highlight=false
+---
 
-Note that depending on your registrar and the TTL you set,
+3. Get the CNAME target by running the [CLI](../../development/cli/_index.md) command `platform environment:info edge_hostname`.
+
+<--->
+
+---
+title=In the console
+file=none
+highlight=false
+---
+
+3. Get the CNAME target by accessing your production environment and adapting the auto-generated URL you use to access your website.
+  It's in the form `<branch>-<hash>-<project_id>.<region>.platformsh.site` minus the protocol (`https://`).
+  For e.g. if the url to access your domain is `https://main-def456-abc123.eu-2.platformsh.site`, the CNAME target is `main-def456-abc123.eu-2.platformsh.site`.
+
+{{< /codetabs >}}
+
+4. Add a CNAME record from the `www` subdomain (`www.<YOUR_DOMAIN>`) to the value of the CNAME target.
+  If you have multiple domains you want to be served by the same application you need to add a CNAME record for each of them.
+  If you are planning to host multiple subdomains on different projects,
+  see the additional information about [Subdomains](/domains/steps/subdomains.md) *before* you add your domain to Platform.sh.
+5. Add a CNAME/ANAME/ALIAS from your apex domain (`<YOUR_DOMAIN>`) to the value of the CNAME target.
+  Not all registrar allow these kind of records, see additional information about [Apex domains and CNAME records](/domains/steps/dns.md).
+6. Check that the domain and subdomain are working as expected.
+7. Set the TTL value back to its previous value.
+
+Note that depending on your registrar and the TTL you set on step 2,
 it can take anywhere from 15 minutes to 72 hours for the DNS change to fully propagate across the Internet.
 
-If you are using an apex domain (`<YOUR_DOMAIN>`),
-see the additional information about [Apex domains and CNAME records](/domains/steps/dns.md).
+Example where `<YOUR_DOMAIN>` is `mysite.com`:
 
-If you are planning to host multiple subdomains on different projects,
-see the additional information about [Subdomains](/domains/steps/subdomains.md) *before* you add your domain to Platform.sh.
+- `www.mysite.com` is a CNAME to `main-def456-abc123.eu-2.platformsh.site`.
+- `mysite.com` is an ALIAS/CNAME/ANAME  to `main-def456-abc123.eu-2.platformsh.site`.
+
+Both `www.mysite.com` and `mysite.com` point to the same target. [Redirects](../../define-routes/_index.md) happen in the app.
 
 {{< /codetabs >}}
 
@@ -104,12 +127,91 @@ The CDN should already have been configured in advance to point to Platform.sh a
 
 {{< /note >}}
 
-This step tells the Platform.sh edge layer where to route requests for your website.
-You can do this through the CLI with `platform domain:add <YOUR_DOMAIN>`
-or [using the management console](/administration/web/configure-project.md#domains).
-
+Adding a domain to your project tells the Platform.sh edge layer where to route requests for your website.
 You can add multiple domains to point to your project.
+
 Each domain can have its own custom SSL certificate, or use the default one provided.
+Sometimes it can take Let's Encrypt a couple of minutes to provision the certificate the first time.
+This is normal, and only means the first deploy after enabling a domain may take longer than usual.
+Setting the CNAME record with your DNS provider first helps to minimize that disruption.
+
+Adding a custom domain disables the automatically generated URLs (`main-def456-abc123.eu-2.platformsh.site`).
+
+Add a single domain to your Platform.sh project for `<YOUR_DOMAIN>`:
+
+{{< codetabs >}}
+
+---
+title=In the console
+file=none
+highlight=false
+---
+
+<!--This is in HTML to get the icon not to break the list. -->
+<ol>
+  <li>Select the project where you want to add a domain.</li>
+  <li>Click {{< icon settings >}} <strong>Settings</strong>.</li>
+  <li>Click <strong>Domains</strong>.</li>
+  <li>Enter <code>&lt;YOUR_DOMAIN&gt;</code> into the <strong>Domain</strong> field.</li>
+  <li>Click <strong>+ Add</strong>.</li>
+</ol>
+
+<--->
+---
+title=Using the CLI
+file=none
+highlight=false
+---
+
+Run the following command:
+
+```bash
+platform domain:add -p <PROJECT_ID> <YOUR_DOMAIN>
+```
+
+{{< /codetabs >}}
+
+When a domain is added to your project,
+the `{default}` in `routes.yaml` is replaced with `<YOUR_DOMAIN>` anywhere it appears when generating routes to respond to.
+Access the original internal domain by running `platform environment:info edge_hostname -e <BRANCH_NAME>`.
+
+{{< note >}}
+If you are planning on using subdomains across multiple projects, [the setup differs slightly](subdomains.md).
+{{< /note >}}
+
+
+
+## Result
+
+With the assumption that all caches are empty, an incoming request for `mysite.com` results in the following:
+
+1. Your browser asks the DNS root servers for `mysite.com`'s DNS A record (the IP address of this host).
+   It responds with "it's an alias for `www.main-def456-abc123.eu-2.platformsh.site`" (the CNAME),
+   which itself resolves to the A record with IP address `1.2.3.4` (or whatever the actual address is).
+   By default DNS requests by browsers are recursive, so there is no performance penalty for using CNAMEs.
+2. Your browser sends a request to `1.2.3.4` for domain `mysite.com`.
+3. Your router responds with an HTTP 301 redirect to `www.mysite.com` (because that's what `routes.yaml` specified).
+4. Your browser looks up `www.mysite.com` and, as above, gets an alias for `www.main-def456-abc123.eu-2.platformsh.site`, which is IP `1.2.3.4`.
+5. Your browser sends a request to `1.2.3.4` for domain `www.mysite.com`.
+   Your router passes the request through to your application which in turn responds with whatever it's supposed to do.
+
+On subsequent requests, your browser knows to connect to `1.2.3.4` for domain `www.mysite.com` and skips the rest.
+The entire process takes only a few milliseconds.
+
+## Bonus steps (Optional)
+
+### Configure health notifications
+
+While not required, it's strongly recommended that you set up [health notifications](/integrations/notifications.md)
+to advise you if your site is experiencing issues such as running low on disk space.
+Notifications can be sent via email, Slack, or PagerDuty.
+
+### Configure automatic backups
+
+It's strongly recommended that you set up an [API token](/development/cli/api-tokens.md) and install the CLI
+to define [an automatic backup](/administration/backup-and-restore.md#automated-backups) cron task.
+
+### Use hosts file
 
 If you require access to the site before the domain name becomes active,
 you can create a `hosts` file entry on your computer
@@ -162,20 +264,3 @@ highlight=false
 You can dynamically switch DNS IP addresses without modifying your `hosts` file with the [Firefox LiveHosts add-on](https://addons.mozilla.org/en-US/firefox/addon/livehosts/).
 
 {{< /codetabs >}}
-
-Sometimes it can take Let's Encrypt a couple of minutes to provision the certificate the first time.
-This is normal, and only means the first deploy after enabling a domain may take longer than usual.
-Setting the CNAME record with your DNS provider first helps to minimize that disruption.
-
-## Bonus steps (Optional)
-
-### Configure health notifications
-
-While not required, it's strongly recommended that you set up [health notifications](/integrations/notifications.md)
-to advise you if your site is experiencing issues such as running low on disk space.
-Notifications can be sent via email, Slack, or PagerDuty.
-
-### Configure automatic backups
-
-It's strongly recommended that you set up an [API token](/development/cli/api-tokens.md) and install the CLI
-to define [an automatic backup](/administration/backup-and-restore.md#automated-backups) cron task.

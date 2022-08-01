@@ -10,23 +10,23 @@ sidebarTitle: "DNS and CNAMEs"
 ## Why CNAMEs?
 
 Platform.sh is a cloud hosting provider.
-That means each individual "site" is not its own computer but a set of containers running on one or more virtual machines,
+Each individual hosted "site" is a set of containers running on one or more virtual machines,
 which are themselves running on any number of physical computers, all of which are shared with other customers running the same configuration.
-An entire region of projects runs behind our dedicated, high-performance edge routers,
+An entire region of projects runs behind dedicated, high-performance edge routers,
 which are responsible for mapping incoming requests to the particular container on a particular host that is appropriate.
 
-All of that logic is quite robust and fast, but it does require that incoming requests all get sent first to the edge routers.
-While the [IP addresses of the edge routers](/development/regions.md) are fairly stable, they are not guaranteed to never change.
-We also may add or remove routers to help scale the region, or take them offline one at a time for upgrades and maintenance.
+That logic requires incoming requests to get sent to the edge routers first.
+While the [IP addresses of the edge routers](/development/regions.md) are fairly stable, they aren't guaranteed to never change.
+To help scale a region, routers can be added or removed. For upgrades and maintenance, routers can get taken offline one at a time.
 It's therefore critical that inbound requests always know what the IPs are of the edge routers at the time of the request.
 
 All of Platform.sh's "edge hostnames" (the auto-generated URLs in the form `<branch>-<hash>-<project_id>.<region>.platformsh.site`) are DNS records we control that resolve to the IP addresses of the edge routers for that region.
 If an edge router is updated, taken out of rotation, etc. then those domains update quickly and automatically with no further action required.
 
-An A record pointed at the same IP addresses would need to be updated manually every time an edge router changes or is temporarily offline.
+An A record pointed at the same IP addresses needs to be updated manually every time an edge router changes or is temporarily offline.
 That means every time Platform.sh is doing routine maintenance or upgrades on the edge routers there's a significant potential for a site to experience a partial outage if a request comes in for an offline edge router.
 
-We don't want that. You don't want that. Using a CNAME DNS record pointing at the "edge hostname" avoids that problem, as it updates almost immediately should our edge router configuration change.
+Using a CNAME DNS record pointing at the "edge hostname" avoids that problem, as it updates almost immediately should our edge router configuration change.
 
 ## Why are CNAME records problematic?
 
@@ -56,8 +56,7 @@ file=none
 highlight=false
 ---
 
-Many DNS providers have found a way around the CNAME-on-Apex limitation.
-Some DNS registrars now offer custom, non-standard records (sometimes called `ANAME` or `ALIAS`) that you can manage like a CNAME.
+Some DNS registrars offer custom, non-standard records (sometimes called `ANAME` or `ALIAS`) around the CNAME-on-Apex limitation.
 It does an internal lookup behind the scenes and responds to DNS lookups as if they were an `A` record.
 As these are non-standard their behavior (and quality) can vary, and not all DNS registrars offer such a feature.
 
@@ -70,8 +69,8 @@ Examples of such workaround records include:
 - ALIAS at [DNSimple](https://dnsimple.com/) or [ClouDNS](https://www.cloudns.net/)
 <!-- vale Platform.condescending = YES -->
 
-Platform.sh recommends ensuring that your DNS Provider supports dynamic apex domains before registering your domain name with them.
-If you are using a DNS Provider that does not support dynamic apex domains then you are unable to use `<YOUR_DOMAIN>` with Platform.sh, and need to use only `www.<YOUR_DOMAIN>` (or similar) instead.
+Ensure that your DNS Provider supports dynamic apex domains before registering your domain name with them.
+If you are using a DNS Provider that doesn't support dynamic apex domains then you are unable to use `<YOUR_DOMAIN>` with Platform.sh, and need to use only `www.<YOUR_DOMAIN>` (or similar) instead.
 
 <--->
 
@@ -95,7 +94,8 @@ file=none
 highlight=false
 ---
 
-If your preferred registrar/DNS provider doesn't support either custom records or the apex domain forwarding options above, free services such as [WWWizer](http://wwwizer.com/) allow blind redirects and allow you to use a CNAME record to Platform.sh for `www.<YOUR_DOMAIN>` and an `A` record to their service at `<YOUR_DOMAIN>`, which in turn sends a redirect.
+If your preferred registrar/DNS provider doesn't support either custom records or the apex domain forwarding options above,
+free services such as [WWWizer](http://wwwizer.com/) allow blind redirects and allow you to use a CNAME record to Platform.sh for `www.<YOUR_DOMAIN>` and an `A` record to their service at `<YOUR_DOMAIN>`, which in turn sends a redirect.
 
 {{< note >}}
 If using a redirection service, you must ensure that `http://<YOUR_DOMAIN>` redirects to `http://www.<YOUR_DOMAIN>`, not to `https://www.<YOUR_DOMAIN>` (That is, the HTTP URL redirects to an HTTP URL, not to an HTTPS URL.).

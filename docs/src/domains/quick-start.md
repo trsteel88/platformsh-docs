@@ -6,36 +6,64 @@ description: |
 ---
 {{% description %}}
 
-This page gives a basic typical example.
-See the [Step by step guide](../domains/steps/_index.md) for more complex cases.
-
-{{< note theme="warning">}}
-
-Adding a custom domain means your existing automatically generated URLs stop working.
-
-Don't add a custom domain to your project until you're fully ready to change your DNS settings.
-Until that time, continue working with the Platform.sh generated URLs.
-
-{{< /note >}}
-
-{{< note>}}
-
-Custom domains can only be added to the default environment on production plans (Standard or larger).
-
-{{< /note >}}
+This page gives a basic configuration example.
+For more details, see the [Step by step guide](../domains/steps/_index.md).
 
 ## Before you begin
 
 You need to:
 
 - Have a project that's ready to be live.
+- Have a project plan size that's set to **Standard** or higher.
 - Have a domain and have access to its settings on the registrar's website.
 - (Optional) Have the [CLI](../development/cli/_index.md) installed locally.
 - Make sure that your registrar allows [CNAMEs on Apex domains or one of the alternatives](/domains/steps/dns.md).
 
-## 1. Set your domain
+## 1. Configure your DNS provider
 
-Now, add a single domain to your Platform.sh project for `<YOUR_DOMAIN>`:
+To configure your domain name to point to your project:
+
+1. Log-in to your registrar's website to manage your domain.
+2. Set the Time-To-Live (TTL) on your domain to the lowest possible value to minimize transition time.
+
+{{< codetabs >}}
+
+---
+title=Using the CLI
+file=none
+highlight=false
+---
+
+3. Get the CNAME target by running the [CLI](../development/cli/_index.md) command `platform environment:info edge_hostname`.
+
+<--->
+
+---
+title=In the console
+file=none
+highlight=false
+---
+
+3. Get the CNAME target by accessing your production environment and copy the automatically generated URL you use to access your website.
+  For e.g. if the url to access your production environment is `https://main-def456-abc123.eu-2.platformsh.site`, the CNAME target is `main-def456-abc123.eu-2.platformsh.site`.
+
+{{< /codetabs >}}
+
+4. Add a CNAME record from the `www` subdomain (`www.<YOUR_DOMAIN>`) to the value of the CNAME target.
+5. Add a CNAME/ANAME/ALIAS from your apex domain (`<YOUR_DOMAIN>`) to the value of the CNAME target.
+  Not all registrar allow these kind of records, see additional information about [Apex domains and CNAME records](/domains/steps/dns.md).
+6. Check that the domain and subdomain are working as expected.
+7. Set the TTL value back to its previous value.
+
+Note that depending on your registrar and the TTL you set on step 2,
+it can take anywhere from 15 minutes to 72 hours for the DNS change to fully propagate across the Internet.
+
+## 2. Set your domain
+
+Note: custom domains can only be added to the default environment on production plans (Standard or larger).
+Also, adding a custom domain disables the automatically generated URLs (`main-def456-abc123.eu-2.platformsh.site`).
+
+Add a single domain to your Platform.sh project for `<YOUR_DOMAIN>`:
 
 {{< codetabs >}}
 
@@ -69,78 +97,9 @@ platform domain:add -p <PROJECT_ID> <YOUR_DOMAIN>
 
 {{< /codetabs >}}
 
-As soon as you add the domain, Platform.sh no longer serves `main-def456-abc123.eu-2.platformsh.site`.
-Instead, `{default}` in `routes.yaml` is replaced with `<YOUR_DOMAIN>` anywhere it appears when generating routes to respond to.
-
-You can still access the original internal domain by running `platform environment:info edge_hostname -e <BRANCH_NAME>`.
-
 {{< note >}}
 If you are planning on using subdomains across multiple projects, [the setup differs slightly](./steps/subdomains.md).
 {{< /note >}}
-
-## 2. Configure your DNS provider
-
-To configure your domain name to point to your project:
-
-1. Log-in to your registrar's website to manage your domain.
-2. Set the Time-To-Live (TTL) on your domain to the lowest possible value. This minimizes transition time.
-
-{{< codetabs >}}
-
----
-title=Using the CLI
-file=none
-highlight=false
----
-
-3. Get the CNAME target by running the [CLI](../development/cli/_index.md) command `platform environment:info edge_hostname`.
-
-<--->
-
----
-title=In the console
-file=none
-highlight=false
----
-
-3. Get the CNAME target by accessing your production environment and adapting the auto-generated URL you use to access your website. It's in the form `<branch>-<hash>-<project_id>.<region>.platformsh.site` minus the protocol (`https://`). For e.g. if the url to access your domain is `https://main-def456-abc123.eu-2.platformsh.site`, the CNAME target is `main-def456-abc123.eu-2.platformsh.site`.
-
-{{< /codetabs >}}
-
-4. Add a CNAME record from the `www` subdomain (`www.<YOUR_DOMAIN>`) to the value of the CNAME target. If you have multiple domains you want to be served by the same application you need to add a CNAME record for each of them. If you are planning to host multiple subdomains on different projects,
-see the additional information about [Subdomains](/domains/steps/subdomains.md) *before* you add your domain to Platform.sh.
-5. Add a CNAME/ANAME/ALIAS from your apex domain (`<YOUR_DOMAIN>`) to the value of the CNAME target. Not all registrar allow these kind of records, see additional information about [Apex domains and CNAME records](/domains/steps/dns.md).
-6. Check that the domain and subdomain are working as expected.
-7. Set the TTL value back to its previous value.
-
-Note that depending on your registrar and the TTL you set on step 2,
-it can take anywhere from 15 minutes to 72 hours for the DNS change to fully propagate across the Internet.
-
-Example where `mysite.com` is `<YOUR_DOMAIN>`:
-
-- `www.mysite.com` is a CNAME to `main-def456-abc123.eu-2.platformsh.site`.
-- `mysite.com` is an ALIAS/CNAME/ANAME  to `main-def456-abc123.eu-2.platformsh.site`.
-
-Both `www.mysite.com` and `mysite.com` point to the same target. [Redirects](../define-routes/_index.md) happen in the app.
-
-## Result
-
-Here's what happens under the hood.
-Assume for a moment that all caches everywhere are empty.
-An incoming request for `mysite.com` results in the following:
-
-1. Your browser asks the DNS root servers for `mysite.com`'s DNS A record (the IP address of this host).
-   It responds with "it's an alias for `www.main-def456-abc123.eu-2.platformsh.site`" (the CNAME),
-   which itself resolves to the A record with IP address `1.2.3.4` (or whatever the actual address is).
-   By default DNS requests by browsers are recursive, so there is no performance penalty for using CNAMEs.
-2. Your browser sends a request to `1.2.3.4` for domain `mysite.com`.
-3. Your router responds with an HTTP 301 redirect to `www.mysite.com` (because that's what `routes.yaml` specified).
-4. Your browser looks up `www.mysite.com` and, as above, gets an alias for `www.main-def456-abc123.eu-2.platformsh.site`, which is IP `1.2.3.4`.
-5. Your browser sends a request to `1.2.3.4` for domain `www.mysite.com`.
-   Your router passes the request through to your application which in turn responds with whatever it's supposed to do.
-
-On subsequent requests, your browser knows to connect to `1.2.3.4` for domain `www.mysite.com` and skips the rest.
-The entire process takes only a few milliseconds.
 
 ## What's next
 
