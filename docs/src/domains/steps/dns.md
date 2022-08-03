@@ -1,13 +1,13 @@
 ---
 title: "DNS management and Apex domains"
 weight: 1
-description: "Platform.sh expects you to use a CNAME for all DNS records. However, that is problematic with some DNS registrars."
-sidebarTitle: "DNS and CNAMEs"
+description: "Platform.sh expects you to use a Canonical Name record (CNAME) for all DNS records. However, not all DNS registrars support these."
+sidebarTitle: "DNS and CNAME"
 ---
 
 {{% description %}}
 
-## Why CNAMEs?
+## Why CNAME records?
 
 Platform.sh is a cloud hosting provider.
 Each individual hosted "site" is a set of containers running on one or more virtual machines,

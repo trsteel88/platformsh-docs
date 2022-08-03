@@ -17,7 +17,7 @@ You need to:
 - Have a project plan size that's set to **Standard** or higher.
 - Have a domain and have access to its settings on the registrar's website.
 - (Optional) Have the [CLI](../development/cli/_index.md) installed locally.
-- Make sure that your registrar allows [CNAMEs on Apex domains or one of the alternatives](/domains/steps/dns.md).
+- Make sure that your registrar allows [CNAME on Apex domains or one of the alternatives](/domains/steps/dns.md).
 
 ## 1. Configure your DNS provider
 
@@ -45,7 +45,7 @@ highlight=false
 ---
 
 3. Get the CNAME target by accessing your production environment and copy the automatically generated URL you use to access your website.
-  For e.g. if the url to access your production environment is `https://main-def456-abc123.eu-2.platformsh.site`, the CNAME target is `main-def456-abc123.eu-2.platformsh.site`.
+  For example if the URL to access your production environment is `https://main-def456-abc123.eu-2.platformsh.site`, the CNAME target is `main-def456-abc123.eu-2.platformsh.site`.
 
 {{< /codetabs >}}
 
@@ -103,4 +103,4 @@ If you are planning on using subdomains across multiple projects, [the setup dif
 
 ## What's next
 
-* Optional: [use a CDN](../domains/cdn/_index.md)
+- Optional: [use a CDN](../domains/cdn/_index.md)

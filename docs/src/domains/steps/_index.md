@@ -29,7 +29,7 @@ Note that the domain used for non-production environments is always generated an
 even if your project is on a Production plan.
 
 If you are on a Development plan, you can't add a domain.
-Upgrade your subscription to a production plan:
+To upgrade your subscription to a production plan:
 
 <!--This is in HTML to get the icon not to break the list. -->
 <ol>
@@ -93,7 +93,7 @@ highlight=false
 
 3. Get the CNAME target by accessing your production environment and adapting the auto-generated URL you use to access your website.
   It's in the form `<branch>-<hash>-<project_id>.<region>.platformsh.site` minus the protocol (`https://`).
-  For e.g. if the url to access your domain is `https://main-def456-abc123.eu-2.platformsh.site`, the CNAME target is `main-def456-abc123.eu-2.platformsh.site`.
+  For e.g. if the URL to access your domain is `https://main-def456-abc123.eu-2.platformsh.site`, the CNAME target is `main-def456-abc123.eu-2.platformsh.site`.
 
 {{< /codetabs >}}
 
@@ -126,16 +126,6 @@ If using a CDN, skip this step.
 The CDN should already have been configured in advance to point to Platform.sh as its upstream.
 
 {{< /note >}}
-
-Adding a domain to your project tells the Platform.sh edge layer where to route requests for your website.
-You can add multiple domains to point to your project.
-
-Each domain can have its own custom SSL certificate, or use the default one provided.
-Sometimes it can take Let's Encrypt a couple of minutes to provision the certificate the first time.
-This is normal, and only means the first deploy after enabling a domain may take longer than usual.
-Setting the CNAME record with your DNS provider first helps to minimize that disruption.
-
-Adding a custom domain disables the automatically generated URLs (`main-def456-abc123.eu-2.platformsh.site`).
 
 Add a single domain to your Platform.sh project for `<YOUR_DOMAIN>`:
 
@@ -171,6 +161,10 @@ platform domain:add -p <PROJECT_ID> <YOUR_DOMAIN>
 
 {{< /codetabs >}}
 
+Adding a domain to your project tells the edge layer where to route requests for your website.
+You can add multiple domains to point to your project.
+
+Adding a custom domain disables the automatically generated URLs (`main-def456-abc123.eu-2.platformsh.site`).
 When a domain is added to your project,
 the `{default}` in `routes.yaml` is replaced with `<YOUR_DOMAIN>` anywhere it appears when generating routes to respond to.
 Access the original internal domain by running `platform environment:info edge_hostname -e <BRANCH_NAME>`.
@@ -178,8 +172,6 @@ Access the original internal domain by running `platform environment:info edge_h
 {{< note >}}
 If you are planning on using subdomains across multiple projects, [the setup differs slightly](subdomains.md).
 {{< /note >}}
-
-
 
 ## Result
 
@@ -204,7 +196,6 @@ The entire process takes only a few milliseconds.
 
 While not required, it's strongly recommended that you set up [health notifications](/integrations/notifications.md)
 to advise you if your site is experiencing issues such as running low on disk space.
-Notifications can be sent via email, Slack, or PagerDuty.
 
 ### Configure automatic backups
 
@@ -215,11 +206,9 @@ to define [an automatic backup](/administration/backup-and-restore.md#automated-
 
 If you require access to the site before the domain name becomes active,
 you can create a `hosts` file entry on your computer
-and point it to the IP address that resolves when you access your production project branch.
+and point it to the IP address linked to your project's production branch internal domain.
 
-To get the IP address, first run `platform environment:info edge_hostname`.
-That prints the "internal" domain name for your project.
-Run `ping <YOUR_DOMAIN>` to get its IP address.
+To get the IP addresses of your internal domain, run `dig +short $(platform environment:info edge_hostname`.
 
 {{< codetabs >}}
 

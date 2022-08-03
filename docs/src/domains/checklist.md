@@ -46,7 +46,7 @@ Platform.sh doesn't charge for using a 3rd party TLS certificate, although the i
 Platform.sh supports all kinds of certificates including domain-validated certificates,
 extended validation (EV) certificates, high-assurance certificates and wildcard certificates.
 The use of HA or EV certificates is the main reason why you may wish to use a third party issuer rather than the default certificate.
-You also need a custom certificate if you use wildcard routes, as Let's Encrypt doesn't support wildcard certificates.
+If you use wildcard routes, you need a custom certificate.
 
 If you do wish to use a 3rd party certificate, ensure it is purchased and active prior to going live.
 
