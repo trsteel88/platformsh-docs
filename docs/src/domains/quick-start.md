@@ -17,7 +17,7 @@ You need to:
 - Have a project plan size that's set to **Standard** or higher.
 - Have a domain and have access to its settings on the registrar's website.
 - (Optional) Have the [CLI](../development/cli/_index.md) installed locally.
-- Make sure that your registrar allows [CNAME on Apex domains or one of the alternatives](/domains/steps/dns.md).
+- Make sure that your registrar allows [Canonical Name record (CNAME) on Apex domains or one of the alternatives](/domains/steps/dns.md).
 
 ## 1. Configure your DNS provider
 
@@ -103,4 +103,4 @@ If you are planning on using subdomains across multiple projects, [the setup dif
 
 ## What's next
 
-- Optional: [use a CDN](../domains/cdn/_index.md)
+- Optional: [use a Content Delivery Network (CDN)](../domains/cdn/_index.md)

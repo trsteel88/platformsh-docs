@@ -93,7 +93,7 @@ highlight=false
 
 3. Get the CNAME target by accessing your production environment and adapting the auto-generated URL you use to access your website.
   It's in the form `<branch>-<hash>-<project_id>.<region>.platformsh.site` minus the protocol (`https://`).
-  For e.g. if the URL to access your domain is `https://main-def456-abc123.eu-2.platformsh.site`, the CNAME target is `main-def456-abc123.eu-2.platformsh.site`.
+  For example if the URL to access your domain is `https://main-def456-abc123.eu-2.platformsh.site`, the CNAME target is `main-def456-abc123.eu-2.platformsh.site`.
 
 {{< /codetabs >}}
 

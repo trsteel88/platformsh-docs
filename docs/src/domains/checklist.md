@@ -11,7 +11,7 @@ sidebarTitle: "Pre-Launch Checklist"
 ## 1. Register a domain name with a supported provider
 
 You have a domain name registered for your site with a Registrar of your choice.
-The registrar must allow you to use CNAMEs for your domain.
+The registrar must allow you to use a Canonical Name record (CNAME) for your domain.
 Some registrars may call these Aliases or similar.
 If your domain is currently active elsewhere,
 the Time-To-Live (TTL) on your domain is set to the lowest possible value in order to minimize transition time.
@@ -19,7 +19,7 @@ the Time-To-Live (TTL) on your domain is set to the lowest possible value in ord
 {{< note >}}
 
 You can't use a `A` record.
-Verify your DNS provider supports CNAMES and Apex domains.
+Verify your DNS provider supports CNAME and Apex domains.
 
 {{< /note >}}
 
@@ -48,9 +48,9 @@ extended validation (EV) certificates, high-assurance certificates and wildcard 
 The use of HA or EV certificates is the main reason why you may wish to use a third party issuer rather than the default certificate.
 If you use wildcard routes, you need a custom certificate.
 
-If you do wish to use a 3rd party certificate, ensure it is purchased and active prior to going live.
+If you do wish to use a 3rd party certificate, ensure it's purchased and active before going live.
 
-## 4. (Optional) Configure your CDN
+## 4. (Optional) Configure your Content Delivery Network (CDN)
 
 If you are using a CDN, either one included with an Enterprise plan or one you provide for a self-service Grid project,
 ensure that your CDN account is registered and configured in advance.
